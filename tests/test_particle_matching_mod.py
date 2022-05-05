@@ -9,6 +9,7 @@ A test function for the calibration module
 """
 
 from myptv.imaging_mod import camera, img_system
+from myptv.matchtrack import TrackingMatcher
 from myptv.particle_matching_mod import match_blob_files
 
 
@@ -40,7 +41,8 @@ def test_matching():
     voxel_size = 40.0
     max_blob_dist = 0.0
     
-    match = match_blob_files(blob_files, imsys, ROI, voxel_size, max_blob_dist)
+    # match = match_blob_files(blob_files, imsys, ROI, voxel_size, max_blob_dist)
+    match = TrackingMatcher(blob_files, imsys, ROI, voxel_size, max_blob_dist)
     match.get_particles()
     particles = match.particles
     

@@ -131,7 +131,7 @@ class match_blob_files(object):
         self.particles = []
         print('')
         
-        for e,tm in enumerate(frames):
+        for e, tm in enumerate(frames):
             print('', end='\r')
             print(' frame: %d'%tm, end='\r')
             
@@ -270,7 +270,7 @@ class matching(object):
         self.rays = []
         self.ray_camera_indexes = [0]
         for i in range(len(self.imsys.cameras)):
-            cam  = self.imsys.cameras[i]
+            cam = self.imsys.cameras[i]
             particles_i = particles_dic[cam.name]
             self.ray_camera_indexes.append(len(particles_i) + 
                                            self.ray_camera_indexes[-1])
@@ -282,7 +282,7 @@ class matching(object):
         self.RIO = RIO
         self.voxel_size = voxel_size
         self.max_err = max_err
-        
+
         # set up lists of voxel centers:
             
         Nx = ceil((RIO[0][1]-RIO[0][0])/voxel_size)
@@ -613,7 +613,8 @@ class matching_using_time(object):
                 nearest_blobs_coords[ci] = self.pd[cn][bn]
                 
             # second, triangulate them:
-            triangulated = self.imsys.stereo_match(nearest_blobs_coords, 1e9)
+            triangulated = self.imsys.\
+                stereo_match(nearest_blobs_coords, 1e9)
             
         
             # third, if the RMS triangulation error is low enough, add the 
@@ -676,38 +677,38 @@ class matching_using_time(object):
 class initiate_time_matching(object):
     '''
     A class used in the time matching algorithm to initiate the first
-    frame. This class will search for blobs that have a nearest neighbours in 
+    frame. This class will search for blobs that have a nearest neighbours in
     the next frame lower than a given threshold and will first stereo-match
     only these particles.
     '''
-    
+
     def __init__(self, img_system, particles_dic_0, particles_dic_1,
                  max_distance, RIO, voxel_size, max_err=1e9):
         '''
-        input - 
-        
+        input -
+
         img_system - an instance of the imaging system class
-        
-        particles_dic_0 - A dictionary; keys are camera names, and values 
-                         are lists of particle coordinates segmented in 
+
+        particles_dic_0 - A dictionary; keys are camera names, and values
+                         are lists of particle coordinates segmented in
                          each of the cameras at the first frame, t=0.
-                         
-        particles_dic_1 - A dictionary; keys are camera names, and values 
-                         are lists of particle coordinates segmented in 
+
+        particles_dic_1 - A dictionary; keys are camera names, and values
+                         are lists of particle coordinates segmented in
                          each of the cameras at the second frame, t=0+dt.
-                         
-        max_distance - The maximum alowable distance between blobs to be 
-                       considered neighbours. This is in image space 
+
+        max_distance - The maximum alowable distance between blobs to be
+                       considered neighbours. This is in image space
                        coordinates (how many pixels blobs move in the 2D
                        images?).
-        
-        RIO - A nested list of 3X2 elements. The first holds the minimum and 
-              maximum values of x coordinates, the second is same for y, and 
-              the third for z coordinates. 
-        
+
+        RIO - A nested list of 3X2 elements. The first holds the minimum and
+              maximum values of x coordinates, the second is same for y, and
+              the third for z coordinates.
+
         voxel size - the side length of voxel cubes used in the ray traversal
                      algorithm. Given in lab coordinate scales (e.g. mm).
-        
+
         max_err - maximum allowable RMS triangulation error.
         '''
         self.imsys = img_system
@@ -717,51 +718,51 @@ class initiate_time_matching(object):
         self.max_err = max_err
         self.RIO = RIO
         self.voxel_size = voxel_size
-        # we form KDTrees for the nearest neighbour blobs search        
+        # we form KDTrees for the nearest neighbour blobs search
         self.trees = {}
         for k in self.pd.keys():
             self.trees[k] = KDTree(self.pd1[k])
-        
-    
-    
+
+
+
     def has_neighbour(self, blob, cam):
         '''
         Return True if the given blos has a neares neighbour and False if not.
         '''
         x,y = blob
         dist, dump = self.trees[cam].query((x, y))
-        
+
         if dist < self.max_dist:
             return True
-        
+
         return False
-    
-    
-    
+
+
+
     def choose_blobs_with_neghbours(self):
         '''
         Will go over the blobs in particles_dic_0; if a blob has valid
         neighbours in particles_dic_1, it is added to a new
         particles_dictionary.
         '''
-        
+
         # form the new dictionary
         self.new_pd = {}
-        
+
         # add blobs with neighbours
         for k in self.pd.keys():
             self.new_pd[k] = []
             for blb in self.pd[k]:
                 if self.has_neighbour(blb, k):
                     self.new_pd[k].append(blb)
-                    
-                    
+
+
     def match_blobs_with_neighbours(self):
         '''
         Once blobs that have neighbours have been found, we match them using
         the matching() class (namely, using the voxel method).
         '''
-        
+
         # match particles using the matching object
         M = matching(self.imsys, self.new_pd, self.RIO, self.voxel_size,
                      max_err = self.max_err)
@@ -770,12 +771,12 @@ class initiate_time_matching(object):
         M.list_candidates()
         M.get_particles()
         self.matched_particles = M.matched_particles
-        
 
-        
+
+
     def return_updated_particle_dict(self):
         '''
-        After finding matched particles (self.match_blobs_with_neighbours),  
+        After finding matched particles (self.match_blobs_with_neighbours),
         this will return an updated copy of particle_dictionary, that does
         not contain the used blobs.
         '''
@@ -786,13 +787,12 @@ class initiate_time_matching(object):
                 ci,(rn, xy) = blb
                 cn = self.imsys.cameras[ci].name
                 updated_pd[cn].remove(list(xy))
-                
+
         return updated_pd
 
 
 
 
-    
-        
-        
-        
+
+
+

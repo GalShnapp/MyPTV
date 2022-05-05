@@ -23,9 +23,9 @@ def test_imaging():
     c2 = imaging_mod.camera('2', (1000.,1000.))
     c3 = imaging_mod.camera('3', (1000.,1000.))
     
-    c1.O = array([400.0 , 0, 1])
-    c2.O = array([0, 400.0, -1])
-    c3.O = array([200.0, 400.0 ,400])
+    c1.O = array([400.0 , 0     ,   1])
+    c2.O = array([0     , 400.0 ,   -1])
+    c3.O = array([200.0 , 400.0 ,   400])
     
     c1.f = 4000
     c2.f = 4000
@@ -42,9 +42,9 @@ def test_imaging():
     c1.xh = 1.0
     c1.yh = -1.0
     
-    x = array([0.1,0.1,0.1])        
+    x = array([0.1, 0.1, 0.1])
     
-    imgsys = imaging_mod.img_system([c1,c2,c3])
+    imgsys = imaging_mod.img_system([c1, c2, c3])
     
     proj1 = c1.projection(x)
     proj2 = c2.projection(x)
